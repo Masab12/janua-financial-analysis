@@ -24,7 +24,7 @@ def validate_balance_sheet(balanco: BalanceSheet) -> bool:
     
     # Check year N
     diff_n = abs(balanco.year_n.total_ativo - 
-                 (balanco.year_n.total_passivo + balanco.year_n.total_capital_proprio))
+                 (balanco.year_n.total_passivo + balanco.year_n.total_capital_proprio)) #Check Year N
     
     if diff_n > tolerance:
         logger.warning(f"Balance sheet year N doesn't balance. Difference: {diff_n}")
