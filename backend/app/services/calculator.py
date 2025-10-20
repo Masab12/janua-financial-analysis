@@ -349,12 +349,50 @@ class FinancialCalculator:
     def _calc_resumo_balanco_funcional(self) -> dict:
         """
         Análise do Balanço Funcional
-        This requires Fundo de Maneio, NFM, Tesouraria calculations
-        Simplified version for MVP
+        Based on Excel logic: checks FM, NFM, and Tesouraria
+        Returns: Bom, Médio, or Mau
         """
+        # Calculate Fundo de Maneio (FM) = Ativo Corrente - Passivo Corrente
+        fm = self.bs.year_n.total_ativo_corrente - self.bs.year_n.total_passivo_corrente
+        
+        # Calculate NFM (Necessidades Fundo Maneio) = Inventários + Clientes - Fornecedores
+        nfm = (self.bs.year_n.inventarios + 
+               self.bs.year_n.clientes - 
+               self.bs.year_n.fornecedores)
+        
+        # Calculate Tesouraria = FM - NFM
+        tesouraria = fm - nfm
+        
+        # Determine status based on Excel logic
+        # Bom: FM > 0, NFM < 0, Tesouraria > 0 OR FM > 0, NFM > 0, Tesouraria > 0
+        # Médio: FM > 0, NFM > 0, Tesouraria < 0 OR FM < 0, NFM < 0, Tesouraria > 0
+        # Mau: Otherwise
+        
+        if fm > 0 and nfm < 0 and tesouraria > 0:
+            status = "Bom"
+            mensagem = "Situação financeira muito favorável: necessidades operacionais cobertas e excedente financeiro disponível."
+        elif fm > 0 and nfm > 0 and tesouraria > 0:
+            status = "Bom"
+            mensagem = "Situação financeira equilibrada, com fundo de maneio suficiente para cobrir as necessidades operacionais."
+        elif fm > 0 and nfm > 0 and tesouraria < 0:
+            status = "Médio"
+            mensagem = "Fundo de maneio positivo, mas insuficiente. Empresa depende parcialmente de financiamentos bancários."
+        elif fm < 0 and nfm < 0 and tesouraria > 0:
+            status = "Médio"
+            mensagem = "Situação financeira razoável, com necessidades operacionais cobertas, mas risco devido a recursos estáveis insuficientes."
+        elif fm < 0 and nfm > 0 and tesouraria < 0:
+            status = "Mau"
+            mensagem = "Situação financeira delicada: recursos estáveis insuficientes e elevada dependência de financiamentos de curto prazo."
+        elif fm < 0 and nfm < 0 and tesouraria < 0:
+            status = "Mau"
+            mensagem = "Situação financeira crítica, com desequilíbrio elevado: fundo de maneio negativo e tesouraria deficitária. Risco iminente de incapacidade em cumprir compromissos financeiros."
+        else:
+            status = "Mau"
+            mensagem = "Situação financeira crítica, com desequilíbrio elevado: fundo de maneio negativo e tesouraria deficitária. Risco iminente de incapacidade em cumprir compromissos financeiros."
+        
         return {
-            "status": "Em desenvolvimento",
-            "mensagem": "Análise detalhada do balanço funcional"
+            "status": status,
+            "mensagem": mensagem
         }
     
     def _calc_ativo_economico(self) -> MetricValue:

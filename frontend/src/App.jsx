@@ -281,7 +281,7 @@ function App() {
         {currentStep === 4 && results && (
           <>
             {console.log('🎨 Rendering ResultsDisplay with:', results)}
-            <ResultsDisplay results={results} />
+            <ResultsDisplay results={results} originalData={financialData} />
             <div className="mt-6">
               <Button type="button" onClick={handleReset} fullWidth>
                 Nova Análise
