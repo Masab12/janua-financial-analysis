@@ -6,6 +6,8 @@
 builder = "DOCKERFILE"
 # Dockerfile path is relative to project root
 dockerfilePath = "backend/Dockerfile"
+# Set build context to backend directory
+dockerContext = "backend"
 
 [deploy]
 # Let Dockerfile CMD handle the start command
