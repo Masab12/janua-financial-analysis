@@ -21,7 +21,7 @@ class Settings(BaseSettings):
     # CORS - Which websites can call our API
     # For production, replace localhost with actual domains
     # Can be set as comma-separated string or JSON array
-    allowed_origins: str = "http://localhost:3000,http://localhost:5173,https://janua.pt,https://www.janua.pt"
+    allowed_origins: str = "*"
     
     @property
     def cors_origins(self) -> List[str]:
