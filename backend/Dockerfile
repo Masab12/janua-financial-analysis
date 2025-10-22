@@ -25,6 +25,11 @@ RUN mkdir -p logs
 # Set environment variable for unbuffered Python output
 ENV PYTHONUNBUFFERED=1
 
-# Start command - Railway sets PORT environment variable
-# Use exec form to properly handle signals
-CMD ["sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port $PORT --workers 1"]
+# Default port (Railway will override with PORT env var)
+ENV PORT=8000
+
+# Expose port
+EXPOSE 8000
+
+# Start command using shell to properly expand variables
+CMD sh -c "echo 'Starting on port: $PORT' && uvicorn app.main:app --host 0.0.0.0 --port $PORT --log-level info"
