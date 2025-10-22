@@ -4,7 +4,6 @@
 [build]
 # Use Docker for more control over the build process
 builder = "DOCKERFILE"
-dockerfilePath = "Dockerfile"
 
 [deploy]
 # Command to start your FastAPI app with Uvicorn
