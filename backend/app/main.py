@@ -97,6 +97,7 @@ async def startup_event():
     """Run when the API starts up."""
     logger.info(f"Starting {settings.app_name} v{settings.app_version}")
     logger.info(f"Allowed origins: {settings.allowed_origins}")
+    logger.info("API startup complete - ready to accept requests")
 
 
 @app.on_event("shutdown")
