@@ -4,10 +4,8 @@
 [build]
 # Use Docker for more control over the build process
 builder = "DOCKERFILE"
-# Dockerfile path is relative to project root
-dockerfilePath = "backend/Dockerfile"
-# Set build context to backend directory
-dockerContext = "backend"
+# Dockerfile path is relative to backend directory (since this toml is in backend)
+dockerfilePath = "Dockerfile"
 
 [deploy]
 # Let Dockerfile CMD handle the start command
