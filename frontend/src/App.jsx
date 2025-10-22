@@ -7,13 +7,12 @@ import Button from './components/common/Button';
 import Card from './components/common/Card';
 import { createEmptyFinancialData } from './utils/dataStructures';
 import { calculateFinancialMetrics } from './services/api';
-import { dummyData } from './utils/dummyData'; // 🧪 TESTING ONLY - REMOVE BEFORE PRODUCTION
+
 
 function App() {
   const [currentStep, setCurrentStep] = useState(1);
   const [currentYear, setCurrentYear] = useState('year_n');
-  // 🧪 AUTO-FILL WITH DUMMY DATA FOR TESTING - REMOVE BEFORE PRODUCTION
-  const [financialData, setFinancialData] = useState(dummyData);
+  const [financialData, setFinancialData] = useState(createEmptyFinancialData());
   const [results, setResults] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -121,29 +120,7 @@ function App() {
       </header>
 
       <main className="container mx-auto px-4 py-4 md:py-8 flex-grow">
-        {/* 🧪 TESTING MODE BANNER - REMOVE BEFORE PRODUCTION */}
-        <div className="mb-4 bg-yellow-50 border-2 border-yellow-400 rounded-lg p-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <span className="text-2xl">🧪</span>
-              <div>
-                <p className="font-bold text-yellow-900">Modo de Teste - Dados Pré-carregados</p>
-                <p className="text-sm text-yellow-700">Os formulários estão preenchidos com dados dummy para facilitar os testes.</p>
-              </div>
-            </div>
-            <Button
-              onClick={() => {
-                setFinancialData(createEmptyFinancialData());
-                setCurrentStep(1);
-                setResults(null);
-              }}
-              variant="secondary"
-              className="bg-yellow-600 hover:bg-yellow-700 text-white"
-            >
-              Limpar Dados
-            </Button>
-          </div>
-        </div>
+
 
         {currentStep < 4 && (
           <div className="mb-6 md:mb-8">
