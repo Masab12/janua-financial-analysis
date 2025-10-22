@@ -4,8 +4,8 @@
 [build]
 # Use Docker for more control over the build process
 builder = "DOCKERFILE"
-dockerfilePath = "backend/Dockerfile"
-watchPatterns = ["backend/**"]
+dockerfilePath = "Dockerfile"
+workingDirectory = "backend"
 
 [deploy]
 # Healthcheck ensures Railway knows if app is running correctly
