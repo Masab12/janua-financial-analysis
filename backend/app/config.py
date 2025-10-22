@@ -20,12 +20,19 @@ class Settings(BaseSettings):
     
     # CORS - Which websites can call our API
     # For production, replace localhost with actual domains
-    allowed_origins: List[str] = [
-        "http://localhost:3000",
-        "http://localhost:5173",
-        "https://janua.pt",
-        "https://www.janua.pt",
-    ]
+    # Can be set as comma-separated string or JSON array
+    allowed_origins: str = "http://localhost:3000,http://localhost:5173,https://janua.pt,https://www.janua.pt"
+    
+    @property
+    def cors_origins(self) -> List[str]:
+        """Parse allowed_origins into a list."""
+        if self.allowed_origins.startswith("["):
+            # JSON array format
+            import json
+            return json.loads(self.allowed_origins)
+        else:
+            # Comma-separated format
+            return [origin.strip() for origin in self.allowed_origins.split(",")]
     
     # Calculation Settings
     trend_threshold: float = 0.05  # 5% change triggers trend arrow

@@ -22,7 +22,7 @@ app = FastAPI(
 # Configure CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.allowed_origins,
+    allow_origins=settings.cors_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -95,8 +95,10 @@ async def general_exception_handler(request: Request, exc: Exception):
 @app.on_event("startup")
 async def startup_event():
     """Run when the API starts up."""
+    import os
     logger.info(f"Starting {settings.app_name} v{settings.app_version}")
-    logger.info(f"Allowed origins: {settings.allowed_origins}")
+    logger.info(f"PORT: {os.getenv('PORT', 'not set')}")
+    logger.info(f"Allowed origins: {settings.cors_origins}")
     logger.info("API startup complete - ready to accept requests")
 
 
