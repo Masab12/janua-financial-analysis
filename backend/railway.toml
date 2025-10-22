@@ -1,0 +1,26 @@
+# railway.toml
+# Configuration for JANUA Financial API deployment on Railway
+
+[build]
+# Use Nixpacks (Railway's default builder for Python)
+builder = "NIXPACKS"
+# Install dependencies from backend folder
+buildCommand = "pip install -r backend/requirements.txt"
+
+[deploy]
+# Command to start your FastAPI app with Uvicorn
+startCommand = "uvicorn app.main:app --host 0.0.0.0 --port $PORT"
+
+# Healthcheck ensures Railway knows if app is running correctly
+healthcheckPath = "/docs"
+healthcheckTimeout = 100
+
+# Restart app automatically if it fails
+restartPolicyType = "on_failure"
+
+[variables]
+# Set environment variables here (optional, but cleaner than in the dashboard)
+APP_NAME = "JANUA Financial Analysis API"
+APP_VERSION = "1.0.0"
+ALLOWED_ORIGINS = "[\"https://janua.pt\",\"https://www.janua.pt\",\"http://localhost:5173\",\"http://localhost:3000\"]"
+LOG_LEVEL = "INFO"
