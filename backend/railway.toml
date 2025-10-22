@@ -4,8 +4,8 @@
 [build]
 # Use Docker for more control over the build process
 builder = "DOCKERFILE"
-# Dockerfile is in current directory (backend)
-dockerfilePath = "Dockerfile"
+# Dockerfile path is relative to project root
+dockerfilePath = "backend/Dockerfile"
 
 [deploy]
 # Let Dockerfile CMD handle the start command
