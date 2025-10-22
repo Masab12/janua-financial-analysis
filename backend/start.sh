@@ -1,8 +1,17 @@
-#!/bin/bash
-# Start script for Render deployment
+#!/bin/sh
+# Startup script for Railway deployment
 
-# Run database migrations if needed (none for now)
-# python -m alembic upgrade head
+echo "==================================="
+echo "Starting JANUA Financial API"
+echo "==================================="
+echo "PORT environment variable: ${PORT}"
+echo "Python version: $(python --version)"
+echo "==================================="
 
-# Start the FastAPI application
-uvicorn app.main:app --host 0.0.0.0 --port $PORT
+# Use the PORT environment variable, default to 8000 if not set
+PORT=${PORT:-8000}
+
+echo "Starting uvicorn on port: $PORT"
+
+# Start uvicorn
+exec uvicorn app.main:app --host 0.0.0.0 --port "$PORT" --log-level info

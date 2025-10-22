@@ -31,5 +31,9 @@ ENV PORT=8000
 # Expose port
 EXPOSE 8000
 
-# Start command using shell to properly expand variables
-CMD sh -c "echo 'Starting on port: $PORT' && uvicorn app.main:app --host 0.0.0.0 --port $PORT --log-level info"
+# Copy and set permissions for startup script
+COPY start.sh /app/start.sh
+RUN chmod +x /app/start.sh
+
+# Use the startup script as entrypoint
+ENTRYPOINT ["/app/start.sh"]
