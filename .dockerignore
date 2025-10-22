@@ -1,0 +1,28 @@
+# Frontend (not needed for backend deployment)
+frontend/
+node_modules/
+
+# Git
+.git/
+.gitignore
+
+# Documentation
+README.md
+docs/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment files (will be set by Railway)
+.env
+.env.local
+.env.production
+
+# Railway config (not needed in container)
+railway.toml
+backend/railway.toml
