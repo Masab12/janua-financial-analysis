@@ -5,9 +5,26 @@ const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api'
 const api = axios.create({
   baseURL: API_BASE_URL,
   headers: {
-    'Content-Type': 'application/json',
+    'Content-Type': 'application/json; charset=utf-8',
+    'Accept': 'application/json; charset=utf-8',
   },
 });
+
+// Add response interceptor to ensure proper UTF-8 handling
+api.interceptors.response.use(
+  (response) => {
+    // Ensure response data is properly decoded as UTF-8
+    if (response.headers['content-type']?.includes('application/json')) {
+      // The response should already be properly decoded by axios
+      // but we ensure the content-type is set correctly
+      response.headers['content-type'] = 'application/json; charset=utf-8';
+    }
+    return response;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
 
 export const calculateFinancialMetrics = async (financialData) => {
   try {
@@ -43,7 +60,7 @@ export const generatePDF = async (financialData) => {
     const url = window.URL.createObjectURL(new Blob([response.data]));
     const link = document.createElement('a');
     link.href = url;
-    link.setAttribute('download', `relatorio_${financialData.nome_entidade.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`);
+    link.setAttribute('download', `relatorio_${financialData.company_info.nome_empresa.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`);
     document.body.appendChild(link);
     link.click();
     link.remove();

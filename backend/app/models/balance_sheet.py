@@ -8,27 +8,27 @@ class BalanceSheetYear(BaseModel):
     """
     
     # Ativo Não Corrente
-    ativos_fixos_tangiveis: float = Field(default=0.0, ge=0)
-    propriedades_investimento: float = Field(default=0.0, ge=0)
-    goodwill: float = Field(default=0.0, ge=0)
-    ativos_intangiveis: float = Field(default=0.0, ge=0)
-    investimentos_financeiros: float = Field(default=0.0, ge=0)
-    acionistas_socios_nc: float = Field(default=0.0, ge=0)
-    outros_ativos_financeiros: float = Field(default=0.0, ge=0)
-    ativos_impostos_diferidos: float = Field(default=0.0, ge=0)
-    outros_ativos_nao_correntes: float = Field(default=0.0, ge=0)
+    ativos_fixos_tangiveis: float = Field(default=0.0)
+    propriedades_investimento: float = Field(default=0.0)
+    goodwill: float = Field(default=0.0)
+    ativos_intangiveis: float = Field(default=0.0)
+    investimentos_financeiros: float = Field(default=0.0)
+    acionistas_socios_nc: float = Field(default=0.0)
+    outros_ativos_financeiros: float = Field(default=0.0)
+    ativos_impostos_diferidos: float = Field(default=0.0)
+    outros_ativos_nao_correntes: float = Field(default=0.0)
     
     # Ativo Corrente
-    inventarios: float = Field(default=0.0, ge=0)
-    clientes: float = Field(default=0.0, ge=0)
-    adiantamentos_fornecedores: float = Field(default=0.0, ge=0)
-    estado_outros_entes_publicos_ativo: float = Field(default=0.0, ge=0)
-    acionistas_socios_corrente: float = Field(default=0.0, ge=0)
-    outras_contas_receber: float = Field(default=0.0, ge=0)
-    diferimentos_ativo: float = Field(default=0.0, ge=0)
-    ativos_financeiros_correntes: float = Field(default=0.0, ge=0)
-    outros_ativos_correntes: float = Field(default=0.0, ge=0)
-    caixa_depositos_bancarios: float = Field(default=0.0, ge=0)
+    inventarios: float = Field(default=0.0)
+    clientes: float = Field(default=0.0)
+    adiantamentos_fornecedores: float = Field(default=0.0)
+    estado_outros_entes_publicos_ativo: float = Field(default=0.0)
+    acionistas_socios_corrente: float = Field(default=0.0)
+    outras_contas_receber: float = Field(default=0.0)
+    diferimentos_ativo: float = Field(default=0.0)
+    ativos_financeiros_correntes: float = Field(default=0.0)
+    outros_ativos_correntes: float = Field(default=0.0)
+    caixa_depositos_bancarios: float = Field(default=0.0)
     
     # Capital Próprio
     capital_realizado: float = Field(default=0.0)
@@ -45,22 +45,22 @@ class BalanceSheetYear(BaseModel):
     interesses_minoritarios: float = Field(default=0.0)
     
     # Passivo Não Corrente
-    provisoes_nc: float = Field(default=0.0, ge=0)
-    financiamentos_obtidos_nc: float = Field(default=0.0, ge=0)
-    responsabilidades_beneficios_pos_emprego: float = Field(default=0.0, ge=0)
-    passivos_impostos_diferidos: float = Field(default=0.0, ge=0)
-    outras_contas_pagar_nc: float = Field(default=0.0, ge=0)
-    outros_passivos_nao_correntes: float = Field(default=0.0, ge=0)
+    provisoes_nc: float = Field(default=0.0)
+    financiamentos_obtidos_nc: float = Field(default=0.0)
+    responsabilidades_beneficios_pos_emprego: float = Field(default=0.0)
+    passivos_impostos_diferidos: float = Field(default=0.0)
+    outras_contas_pagar_nc: float = Field(default=0.0)
+    outros_passivos_nao_correntes: float = Field(default=0.0)
     
     # Passivo Corrente
-    fornecedores: float = Field(default=0.0, ge=0)
-    adiantamentos_clientes: float = Field(default=0.0, ge=0)
-    estado_outros_entes_publicos_passivo: float = Field(default=0.0, ge=0)
-    acionistas_socios_passivo: float = Field(default=0.0, ge=0)
-    financiamentos_obtidos_corrente: float = Field(default=0.0, ge=0)
-    outras_contas_pagar_corrente: float = Field(default=0.0, ge=0)
-    diferimentos_passivo: float = Field(default=0.0, ge=0)
-    outros_passivos_correntes: float = Field(default=0.0, ge=0)
+    fornecedores: float = Field(default=0.0)
+    adiantamentos_clientes: float = Field(default=0.0)
+    estado_outros_entes_publicos_passivo: float = Field(default=0.0)
+    acionistas_socios_passivo: float = Field(default=0.0)
+    financiamentos_obtidos_corrente: float = Field(default=0.0)
+    outras_contas_pagar_corrente: float = Field(default=0.0)
+    diferimentos_passivo: float = Field(default=0.0)
+    outros_passivos_correntes: float = Field(default=0.0)
     
     @property
     def total_ativo_nao_corrente(self) -> float:

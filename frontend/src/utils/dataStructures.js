@@ -49,8 +49,8 @@ export const createEmptyBalanceSheet = () => ({
 export const createEmptyIncomeStatement = () => ({
   vendas_servicos_prestados: 0,
   subsidios_exploracao: 0,
-  ganhos_perdas_imputados: 0,
-  variacoes_producao: 0,
+  ganhos_perdas_subsidiarias: 0,
+  variacao_inventarios_producao: 0,
   trabalhos_propria_entidade: 0,
   cmvmc: 0,
   fornecimentos_servicos_externos: 0,
@@ -58,23 +58,39 @@ export const createEmptyIncomeStatement = () => ({
   imparidade_inventarios: 0,
   imparidade_dividas_receber: 0,
   provisoes: 0,
-  imparidade_investimentos: 0,
+  imparidade_investimentos_nao_depreciaveis: 0,
   aumentos_reducoes_justo_valor: 0,
   outros_rendimentos_ganhos: 0,
   outros_gastos_perdas: 0,
-  resultado_antes_depreciacao: 0,
-  gastos_depreciacao_amortizacao: 0,
-  imparidade_ativos_depreciacao: 0,
-  resultado_operacional: 0,
-  juros_rendimentos_similares: 0,
-  juros_gastos_similares: 0,
-  resultado_antes_impostos: 0,
+  gastos_depreciacoes_amortizacoes: 0,
+  juros_rendimentos_obtidos: 0,
+  juros_gastos_suportados: 0,
   imposto_rendimento: 0,
-  resultado_liquido: 0,
+});
+
+export const createEmptyCompanyInfo = () => ({
+  nome_empresa: '',
+  setor_atividade: '',
+  objetivo_relatorio: '',
+  email_empresario: '',
 });
 
 export const createEmptyFinancialData = () => ({
   nome_entidade: '',
+  balanco: {
+    year_n: createEmptyBalanceSheet(),
+    year_n1: createEmptyBalanceSheet(),
+    year_n2: createEmptyBalanceSheet(),
+  },
+  demonstracao_resultados: {
+    year_n: createEmptyIncomeStatement(),
+    year_n1: createEmptyIncomeStatement(),
+    year_n2: createEmptyIncomeStatement(),
+  },
+});
+
+export const createEmptyEnhancedFinancialData = () => ({
+  company_info: createEmptyCompanyInfo(),
   balanco: {
     year_n: createEmptyBalanceSheet(),
     year_n1: createEmptyBalanceSheet(),

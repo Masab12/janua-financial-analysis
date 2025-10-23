@@ -131,15 +131,77 @@ def validate_reasonable_values(balanco: BalanceSheet, demonstracao: IncomeStatem
     return True
 
 
-def validate_all(balanco: BalanceSheet, demonstracao: IncomeStatement) -> Tuple[bool, str]:
+def validate_net_result_consistency(balanco: BalanceSheet, demonstracao: IncomeStatement) -> bool:
     """
-    Run all validation checks.
+    Check that Net Result for the Period matches between Balance Sheet and Income Statement.
+    This is a critical accounting validation as per client requirements.
+    """
+    
+    # Check year N
+    bs_result_n = balanco.year_n.resultado_liquido_periodo
+    is_result_n = demonstracao.year_n.resultado_liquido
+    
+    if abs(bs_result_n - is_result_n) > 1.0:  # Allow €1 tolerance for rounding
+        raise ValidationError(
+            f"Resultado líquido do período no balanço (€{bs_result_n:.2f}) "
+            f"diferente da Demonstração de Resultados (€{is_result_n:.2f}) para o ano N"
+        )
+    
+    # Check year N-1
+    bs_result_n1 = balanco.year_n1.resultado_liquido_periodo
+    is_result_n1 = demonstracao.year_n1.resultado_liquido
+    
+    if abs(bs_result_n1 - is_result_n1) > 1.0:
+        raise ValidationError(
+            f"Resultado líquido do período no balanço (€{bs_result_n1:.2f}) "
+            f"diferente da Demonstração de Resultados (€{is_result_n1:.2f}) para o ano N-1"
+        )
+    
+    # Check year N-2
+    bs_result_n2 = balanco.year_n2.resultado_liquido_periodo
+    is_result_n2 = demonstracao.year_n2.resultado_liquido
+    
+    if abs(bs_result_n2 - is_result_n2) > 1.0:
+        raise ValidationError(
+            f"Resultado líquido do período no balanço (€{bs_result_n2:.2f}) "
+            f"diferente da Demonstração de Resultados (€{is_result_n2:.2f}) para o ano N-2"
+        )
+    
+    logger.debug("Net result consistency validation passed for all years")
+    return True
+
+
+def validate_on_request_only(balanco: BalanceSheet, demonstracao: IncomeStatement) -> Tuple[bool, str]:
+    """
+    Run all validation checks ONLY when explicitly called by API endpoints.
+    This prevents validation errors from appearing on app load.
+    
     Returns (success, message) tuple.
     """
     try:
+        # Only validate if we have actual data (not just default zeros)
+        has_balance_data = (
+            balanco.year_n.total_ativo > 0 or 
+            balanco.year_n1.total_ativo > 0 or 
+            balanco.year_n2.total_ativo > 0
+        )
+        
+        has_income_data = (
+            demonstracao.year_n.vendas_servicos_prestados != 0 or
+            demonstracao.year_n1.vendas_servicos_prestados != 0 or
+            demonstracao.year_n2.vendas_servicos_prestados != 0
+        )
+        
+        # If no real data, skip validation (this prevents errors on app load)
+        if not has_balance_data and not has_income_data:
+            logger.debug("No financial data provided, skipping validation")
+            return True, "Nenhum dado fornecido para validação"
+        
+        # Run all validation checks
         validate_balance_sheet(balanco)
         validate_positive_values(balanco)
         validate_income_statement(demonstracao)
+        validate_net_result_consistency(balanco, demonstracao)
         validate_reasonable_values(balanco, demonstracao)
         
         logger.info("All validation checks passed")
@@ -151,3 +213,11 @@ def validate_all(balanco: BalanceSheet, demonstracao: IncomeStatement) -> Tuple[
     except Exception as e:
         logger.error(f"Unexpected validation error: {str(e)}")
         raise ValidationError(f"Erro inesperado na validação: {str(e)}")
+
+
+def validate_all(balanco: BalanceSheet, demonstracao: IncomeStatement) -> Tuple[bool, str]:
+    """
+    Legacy function - now redirects to validate_on_request_only.
+    Maintained for backward compatibility.
+    """
+    return validate_on_request_only(balanco, demonstracao)

@@ -19,6 +19,16 @@ app = FastAPI(
     redoc_url="/redoc"
 )
 
+# Ensure proper UTF-8 encoding for JSON responses
+from fastapi.responses import JSONResponse
+from fastapi.encoders import jsonable_encoder
+
+# Override default JSON response to ensure UTF-8
+class UTF8JSONResponse(JSONResponse):
+    media_type = "application/json; charset=utf-8"
+
+app.default_response_class = UTF8JSONResponse
+
 # Configure CORS
 app.add_middleware(
     CORSMiddleware,
@@ -27,6 +37,20 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+# Character encoding middleware
+@app.middleware("http")
+async def add_charset_header(request: Request, call_next):
+    """Ensure proper UTF-8 encoding for all responses."""
+    response = await call_next(request)
+    
+    # Add UTF-8 charset to content-type header only for JSON responses
+    content_type = response.headers.get("content-type", "")
+    if "application/json" in content_type and "charset" not in content_type:
+        response.headers["content-type"] = "application/json; charset=utf-8"
+    
+    return response
 
 
 # Request logging middleware

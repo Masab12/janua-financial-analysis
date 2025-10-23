@@ -57,7 +57,7 @@ export const balanceSheetFields = {
 };
 
 export const incomeStatementFields = {
-  'Rendimentos': [
+  'Rendimentos e Ganhos': [
     { key: 'vendas_servicos_prestados', label: 'Vendas e Serviços Prestados' },
     { key: 'subsidios_exploracao', label: 'Subsídios à Exploração' },
     { key: 'ganhos_perdas_subsidiarias', label: 'Ganhos/Perdas de Subsidiárias, Assoc. e Empr. Conjuntos' },
@@ -65,26 +65,25 @@ export const incomeStatementFields = {
     { key: 'trabalhos_propria_entidade', label: 'Trabalhos para a Própria Entidade' },
     { key: 'outros_rendimentos_ganhos', label: 'Outros Rendimentos e Ganhos' },
   ],
-  'Gastos': [
+  'Gastos e Perdas': [
     { key: 'cmvmc', label: 'Custo das Mercadorias Vendidas e Mat. Consumidas' },
     { key: 'fornecimentos_servicos_externos', label: 'Fornecimentos e Serviços Externos' },
     { key: 'gastos_pessoal', label: 'Gastos com Pessoal' },
-    { key: 'imparidade_inventarios', label: 'Imparidade de Inventários' },
-    { key: 'imparidade_dividas_receber', label: 'Imparidade de Dívidas a Receber' },
-    { key: 'provisoes', label: 'Provisões' },
-    { key: 'imparidade_investimentos_nao_depreciavel', label: 'Imparidade de Investimentos Não Depreciáveis/Amortizáveis' },
+    { key: 'imparidade_inventarios', label: 'Imparidade de Inventários (perdas/reversões)' },
+    { key: 'imparidade_dividas_receber', label: 'Imparidade de Dívidas a Receber (perdas/reversões)' },
+    { key: 'provisoes', label: 'Provisões (aumentos/reduções)' },
+    { key: 'imparidade_investimentos_nao_depreciaveis', label: 'Imparidade de Investimentos Não Depreciáveis (perdas/reversões)' },
     { key: 'aumentos_reducoes_justo_valor', label: 'Aumentos/Reduções de Justo Valor' },
     { key: 'outros_gastos_perdas', label: 'Outros Gastos e Perdas' },
-    { key: 'gastos_depreciacao_amortizacao', label: 'Gastos/Reversões de Depreciação e Amortização' },
-    { key: 'imparidade_ativos_depreciacao', label: 'Imparidade de Ativos Depreciáveis/Amortizáveis' },
   ],
-  'Resultados': [
-    { key: 'resultado_antes_depreciacao', label: 'Resultado Antes de Depreciações' },
-    { key: 'resultado_operacional', label: 'Resultado Operacional' },
+  'Resultado antes de depreciações, gastos de financiamento e impostos': [
+    { key: 'gastos_depreciacoes_amortizacoes', label: 'Gastos/Reversões de Depreciação e Amortização' },
+  ],
+  'Resultado operacional (antes de gastos de financiamento e impostos)': [
     { key: 'juros_rendimentos_obtidos', label: 'Juros e Rendimentos Similares Obtidos' },
     { key: 'juros_gastos_suportados', label: 'Juros e Gastos Similares Suportados' },
-    { key: 'resultado_antes_impostos', label: 'Resultado Antes de Impostos' },
-    { key: 'imposto_rendimento', label: 'Imposto sobre o Rendimento' },
-    { key: 'resultado_liquido', label: 'Resultado Líquido do Período' },
+  ],
+  'Resultado antes de impostos': [
+    { key: 'imposto_rendimento', label: 'Imposto sobre o Rendimento do Período' },
   ],
 };

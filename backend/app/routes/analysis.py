@@ -1,9 +1,9 @@
 from fastapi import APIRouter
 from fastapi.responses import StreamingResponse
-from app.models.financial_data import InputData, CalculationResult
+from app.models.financial_data import InputData, EnhancedInputData, CalculationResult
 from app.services.calculator import FinancialCalculator
 from app.services.pdf_generator import FinancialPDFGenerator
-from app.validators import validate_all
+from app.validators import validate_all, validate_on_request_only
 from app.exceptions import CalculationError
 from app.logger import get_logger
 from datetime import datetime
@@ -13,27 +13,28 @@ logger = get_logger(__name__)
 
 
 @router.post("/calculate", response_model=CalculationResult)
-async def calculate_metrics(data: InputData):
+async def calculate_metrics(data: EnhancedInputData):
     """
     Main endpoint for financial analysis calculations.
     
     Accepts:
-        - Company name
+        - Company information (name, sector, objective, email)
         - Balance sheet data (3 years)
         - Income statement data (3 years)
     
     Returns:
-        - All 17 Portuguese financial ratios
+        - All Portuguese financial ratios
         - Trend indicators
         - Portuguese interpretations
     
     The calculations match the client's Excel file exactly.
     """
-    logger.info(f"Calculation request received for: {data.nome_entidade}")
+    company_name = data.company_info.nome_empresa
+    logger.info(f"Calculation request received for: {company_name}")
     
     try:
-        # Validate input data first
-        validate_all(data.balanco, data.demonstracao_resultados)
+        # Validate input data first (only when explicitly requested)
+        validate_on_request_only(data.balanco, data.demonstracao_resultados)
         logger.debug("Input validation passed")
         
         # Create calculator and run calculations
@@ -49,13 +50,13 @@ async def calculate_metrics(data: InputData):
         # Build response
         result = CalculationResult(
             timestamp=datetime.now(),
-            empresa=data.nome_entidade,
+            empresa=company_name,
             metrics=metrics,
             success=True,
             message="Cálculo realizado com sucesso"
         )
         
-        logger.info(f"Calculation successful for: {data.nome_entidade}")
+        logger.info(f"Calculation successful for: {company_name}")
         return result
         
     except (ValueError, ZeroDivisionError) as e:
@@ -68,17 +69,18 @@ async def calculate_metrics(data: InputData):
         raise CalculationError(f"Erro inesperado: {str(e)}")
 
 @router.post("/generate-pdf")
-async def generate_pdf(data: InputData):
+async def generate_pdf(data: EnhancedInputData):
     """
     Generate PDF report with financial analysis summary.
     
     Returns a PDF file with the 8 key indicators matching the Relatório format.
     """
-    logger.info(f"PDF generation request for: {data.nome_entidade}")
+    company_name = data.company_info.nome_empresa
+    logger.info(f"PDF generation request for: {company_name}")
     
     try:
         # Validate and calculate
-        validate_all(data.balanco, data.demonstracao_resultados)
+        validate_on_request_only(data.balanco, data.demonstracao_resultados)
         
         calculator = FinancialCalculator(
             balanco=data.balanco,
@@ -112,24 +114,24 @@ async def generate_pdf(data: InputData):
         
         pdf_generator = FinancialPDFGenerator()
         pdf_buffer = pdf_generator.generate_report(
-            empresa_nome=data.nome_entidade,
+            empresa_nome=company_name,
             metrics=metrics_dict,
             balance_sheet=balance_sheet_data,
             income_statement=income_statement_data
         )
         
-        logger.info(f"PDF generated successfully for: {data.nome_entidade}")
+        logger.info(f"PDF generated successfully for: {company_name}")
         
         # Return PDF as streaming response
-        filename = f"relatorio_{data.nome_entidade.replace(' ', '_')}_{datetime.now().strftime('%Y%m%d')}.pdf"
+        filename = f"relatorio_{company_name.replace(' ', '_')}_{datetime.now().strftime('%Y%m%d')}.pdf"
         
-        return StreamingResponse(
+        # Create response with proper headers
+        response = StreamingResponse(
             pdf_buffer,
-            media_type="application/pdf",
-            headers={
-                "Content-Disposition": f"attachment; filename={filename}"
-            }
+            media_type="application/pdf"
         )
+        response.headers["Content-Disposition"] = f"attachment; filename=\"{filename}\""
+        return response
         
     except Exception as e:
         logger.error(f"PDF generation error: {str(e)}", exc_info=True)

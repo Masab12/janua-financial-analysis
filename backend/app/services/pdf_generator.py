@@ -25,7 +25,7 @@ class FinancialPDFGenerator:
         self.light_gray = colors.HexColor('#f5f5f5')
         
     def _create_logo_box(self):
-        """Create logo box matching client format"""
+        """Create logo box - removed placeholder text as per client request"""
         logo_path = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'frontend', 'public', 'logo_blue.png')
         
         if os.path.exists(logo_path):
@@ -40,12 +40,10 @@ class FinancialPDFGenerator:
             except:
                 pass
         
-        # Fallback text logo
-        logo_text = Paragraph('<b>LOGO<br/>da tua<br/>empresa</b>', 
-                             ParagraphStyle('LogoText', fontSize=8, alignment=TA_CENTER))
-        logo_table = Table([[logo_text]], colWidths=[2.5*cm], rowHeights=[2.5*cm])
+        # Return empty space instead of placeholder text
+        empty_space = Paragraph('', ParagraphStyle('Empty', fontSize=8))
+        logo_table = Table([[empty_space]], colWidths=[2.5*cm], rowHeights=[2.5*cm])
         logo_table.setStyle(TableStyle([
-            ('BOX', (0, 0), (-1, -1), 1, colors.black),
             ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
             ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
         ]))

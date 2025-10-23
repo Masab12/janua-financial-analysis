@@ -35,3 +35,8 @@ npm-debug.log*
 __pycache__/
 *.py[cod]
 *.so
+
+# AI/Development Documentation
+.kiro/
+*.md
+!README.md

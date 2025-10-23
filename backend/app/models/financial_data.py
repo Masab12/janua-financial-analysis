@@ -1,12 +1,26 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, EmailStr
 from typing import Optional
 from datetime import datetime
 from app.models.balance_sheet import BalanceSheet
 from app.models.income_statement import IncomeStatement
 
+class CompanyInformation(BaseModel):
+    """Company information for report personalization"""
+    nome_empresa: str = Field(..., min_length=1, max_length=200, description="Nome da empresa (obrigatório)")
+    setor_atividade: Optional[str] = Field(None, max_length=100, description="Setor de atividade (opcional)")
+    objetivo_relatorio: Optional[str] = Field(None, max_length=500, description="Objetivo do relatório (opcional)")
+    email_empresario: Optional[str] = Field(None, description="Email do empresário (opcional)")
+
 class InputData(BaseModel):
     """Complete input data structure"""
     nome_entidade: str = Field(..., min_length=1, max_length=200, description="Nome da entidade/empresa")
+    data_analise: Optional[str] = Field(default=None, description="Data da análise (opcional)")
+    balanco: BalanceSheet
+    demonstracao_resultados: IncomeStatement
+
+class EnhancedInputData(BaseModel):
+    """Enhanced input data structure with company information"""
+    company_info: CompanyInformation
     data_analise: Optional[str] = Field(default=None, description="Data da análise (opcional)")
     balanco: BalanceSheet
     demonstracao_resultados: IncomeStatement

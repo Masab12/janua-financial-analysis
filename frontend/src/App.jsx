@@ -1,26 +1,31 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
+import CompanyInfoForm from './components/forms/CompanyInfoForm';
 import BalanceSheetForm from './components/forms/BalanceSheetForm';
 import IncomeStatementForm from './components/forms/IncomeStatementForm';
 import ResultsDisplay from './components/results/ResultsDisplay';
-import Input from './components/common/Input';
 import Button from './components/common/Button';
-import Card from './components/common/Card';
-import { createEmptyFinancialData } from './utils/dataStructures';
+import { createEmptyEnhancedFinancialData } from './utils/dataStructures';
+
 import { calculateFinancialMetrics } from './services/api';
 
 
 function App() {
   const [currentStep, setCurrentStep] = useState(1);
-  const [currentYear, setCurrentYear] = useState('year_n');
-  const [financialData, setFinancialData] = useState(createEmptyFinancialData());
+  const [currentYear, setCurrentYear] = useState('year_n2'); // Start with oldest year
+  const [financialData, setFinancialData] = useState(createEmptyEnhancedFinancialData());
   const [results, setResults] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [editMode, setEditMode] = useState(false);
+  const [preservedResults, setPreservedResults] = useState(null);
 
-  const handleEntityNameChange = (e) => {
+  const handleCompanyInfoChange = (field, value) => {
     setFinancialData({
       ...financialData,
-      nome_entidade: e.target.value,
+      company_info: {
+        ...financialData.company_info,
+        [field]: value,
+      },
     });
   };
 
@@ -53,22 +58,24 @@ function App() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    if (!financialData.nome_entidade.trim()) {
-      setError('Por favor, insira o nome da entidade');
+    if (!financialData.company_info.nome_empresa.trim()) {
+      setError('Por favor, insira o nome da empresa');
       return;
     }
 
     setLoading(true);
     setError(null);
 
-    console.log('🚀 Submitting financial data...', financialData.nome_entidade);
+    console.log('🚀 Submitting financial data...', financialData.company_info.nome_empresa);
     const result = await calculateFinancialMetrics(financialData);
     console.log('📊 API Result:', result);
 
     if (result.success) {
       console.log('✅ Calculation successful, setting results:', result.data);
       setResults(result.data);
-      setCurrentStep(4);
+      setCurrentStep(4); // Results step
+      setEditMode(false); // Exit edit mode
+      setPreservedResults(null); // Clear preserved results
       console.log('✅ Current step set to 4');
     } else {
       console.error('❌ Calculation failed:', result.error);
@@ -79,24 +86,60 @@ function App() {
   };
 
   const handleReset = () => {
-    setFinancialData(createEmptyFinancialData());
+    setFinancialData(createEmptyEnhancedFinancialData());
     setResults(null);
     setCurrentStep(1);
-    setCurrentYear('year_n');
+    setCurrentYear('year_n2'); // Start with oldest year
     setError(null);
+    setEditMode(false);
+    setPreservedResults(null);
   };
 
+  const handleEditData = (section) => {
+    // Preserve current results
+    setPreservedResults(results);
+    setEditMode(true);
+    
+    // Navigate to appropriate step based on section
+    switch (section) {
+      case 'company':
+        setCurrentStep(1);
+        break;
+      case 'balance':
+        setCurrentStep(2);
+        break;
+      case 'income':
+        setCurrentStep(3);
+        break;
+      default:
+        setCurrentStep(1);
+    }
+    
+    // Clear results to show form
+    setResults(null);
+  };
+
+
+
+  // Make edit function available globally for ResultsDisplay
+  React.useEffect(() => {
+    window.editData = handleEditData;
+    return () => {
+      delete window.editData;
+    };
+  }, []);
+
   const steps = [
-    { number: 1, title: 'Identificação' },
+    { number: 1, title: 'Informações da Empresa' },
     { number: 2, title: 'Balanço' },
     { number: 3, title: 'Demonstração de Resultados' },
     { number: 4, title: 'Resultados' },
   ];
 
   const years = [
-    { key: 'year_n', label: 'Ano N (Atual)' },
+    { key: 'year_n2', label: 'Ano N-2 (Mais Antigo)' },
     { key: 'year_n1', label: 'Ano N-1' },
-    { key: 'year_n2', label: 'Ano N-2' },
+    { key: 'year_n', label: 'Ano N (Atual)' },
   ];
 
   return (
@@ -108,12 +151,22 @@ function App() {
               <h1 className="text-xl md:text-2xl lg:text-3xl font-bold">JANUA Financial Analysis</h1>
               <p className="text-sm md:text-base text-gray-200 mt-1">Análise Financeira Empresarial</p>
             </div>
-            <div className="flex-shrink-0 ml-4">
-              <img 
-                src="/logo_white.png" 
-                alt="JANUA Logo" 
-                className="h-12 md:h-16 lg:h-20 w-auto object-contain"
-              />
+            <div className="flex items-center space-x-2 md:space-x-4">
+
+              <button
+                type="button"
+                onClick={() => alert('Questionário em breve disponível')}
+                className="bg-white bg-opacity-20 hover:bg-opacity-30 text-white px-4 py-2 rounded-lg font-medium text-sm transition-all duration-200 border border-white border-opacity-30"
+              >
+                Questionário
+              </button>
+              <div className="flex-shrink-0">
+                <img 
+                  src="/logo_white.png" 
+                  alt="JANUA Logo" 
+                  className="h-12 md:h-16 lg:h-20 w-auto object-contain"
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -158,28 +211,47 @@ function App() {
           </div>
         )}
 
+        {editMode && (
+          <div className="mb-6 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+            <p className="text-yellow-800 font-medium">
+              Modo de Edição: Altere os dados e recalcule a análise
+            </p>
+          </div>
+        )}
+
+
+
         <form onSubmit={handleSubmit}>
           {currentStep === 1 && (
-            <Card title="Identificação da Entidade">
-              <Input
-                label="Nome da Entidade"
-                name="nome_entidade"
-                type="text"
-                value={financialData.nome_entidade}
-                onChange={handleEntityNameChange}
-                required
+            <>
+              <CompanyInfoForm
+                data={financialData.company_info}
+                onChange={handleCompanyInfoChange}
               />
-              <div className="mt-6">
+              <div className="mt-6 flex flex-col sm:flex-row gap-3 sm:gap-4">
+                {editMode && (
+                  <Button 
+                    type="button" 
+                    onClick={() => {
+                      setResults(preservedResults);
+                      setEditMode(false);
+                      setCurrentStep(4);
+                    }} 
+                    variant="secondary"
+                  >
+                    Cancelar Edição
+                  </Button>
+                )}
                 <Button
                   type="button"
                   onClick={() => setCurrentStep(2)}
                   fullWidth
-                  disabled={!financialData.nome_entidade.trim()}
+                  disabled={!financialData.company_info.nome_empresa.trim()}
                 >
                   Continuar
                 </Button>
               </div>
-            </Card>
+            </>
           )}
 
           {currentStep === 2 && (
@@ -211,6 +283,19 @@ function App() {
                 <Button type="button" onClick={() => setCurrentStep(1)} variant="secondary">
                   Voltar
                 </Button>
+                {editMode && (
+                  <Button 
+                    type="button" 
+                    onClick={() => {
+                      setResults(preservedResults);
+                      setEditMode(false);
+                      setCurrentStep(4);
+                    }} 
+                    variant="secondary"
+                  >
+                    Cancelar Edição
+                  </Button>
+                )}
                 <Button type="button" onClick={() => setCurrentStep(3)} fullWidth>
                   Continuar
                 </Button>
@@ -247,8 +332,21 @@ function App() {
                 <Button type="button" onClick={() => setCurrentStep(2)} variant="secondary">
                   Voltar
                 </Button>
+                {editMode && (
+                  <Button 
+                    type="button" 
+                    onClick={() => {
+                      setResults(preservedResults);
+                      setEditMode(false);
+                      setCurrentStep(4);
+                    }} 
+                    variant="secondary"
+                  >
+                    Cancelar Edição
+                  </Button>
+                )}
                 <Button type="submit" fullWidth disabled={loading}>
-                  {loading ? 'A calcular...' : 'Calcular Análise'}
+                  {loading ? 'A recalcular...' : editMode ? 'Recalcular Análise' : 'Calcular Análise'}
                 </Button>
               </div>
             </>

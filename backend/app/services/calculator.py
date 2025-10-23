@@ -708,12 +708,14 @@ class FinancialCalculator:
     
     def _calc_cobertura_gastos_financiamento(self) -> MetricValue:
         """
-        RCGFRO = (Resultado Operacional + DepreciaÁƒÂ§ÁƒÂµes) / Gastos Financiamento
+        RCGFRO = (EBIT + Depreciações) / Gastos Financiamento
         Excel Row 23: =('DR'!E25+'DR'!K24)/'DR'!K25
+        Fixed: Use EBIT instead of resultado_antes_impostos, and handle zero financial costs properly
         """
-        ro_n = self.dr.year_n.resultado_antes_impostos + self.dr.year_n.juros_gastos_suportados
-        ro_n1 = self.dr.year_n1.resultado_antes_impostos + self.dr.year_n1.juros_gastos_suportados
-        ro_n2 = self.dr.year_n2.resultado_antes_impostos + self.dr.year_n2.juros_gastos_suportados
+        # Use EBIT (operating result) instead of result before taxes
+        ebit_n = self.dr.year_n.ebit
+        ebit_n1 = self.dr.year_n1.ebit
+        ebit_n2 = self.dr.year_n2.ebit
         
         dep_n = self.dr.year_n.gastos_depreciacoes_amortizacoes
         dep_n1 = self.dr.year_n1.gastos_depreciacoes_amortizacoes
@@ -723,18 +725,19 @@ class FinancialCalculator:
         gf_n1 = abs(self.dr.year_n1.juros_gastos_suportados)
         gf_n2 = abs(self.dr.year_n2.juros_gastos_suportados)
         
-        n = (ro_n + dep_n) / gf_n if gf_n > 0 else 0
-        n1 = (ro_n1 + dep_n1) / gf_n1 if gf_n1 > 0 else 0
-        n2 = (ro_n2 + dep_n2) / gf_n2 if gf_n2 > 0 else 0
+        # If no financial costs, return a high value to indicate excellent coverage
+        n = (ebit_n + dep_n) / gf_n if gf_n > 0 else 999.99
+        n1 = (ebit_n1 + dep_n1) / gf_n1 if gf_n1 > 0 else 999.99
+        n2 = (ebit_n2 + dep_n2) / gf_n2 if gf_n2 > 0 else 999.99
         
         return MetricValue(
-            nome="RÁƒÂ¡cio de Cobertura de Gastos de Financiamento (RCGFRO)",
+            nome="Rácio de Cobertura de Gastos de Financiamento (RCGF)",
             unidade="ratio",
             year_n=n,
             year_n1=n1,
             year_n2=n2,
             tendencia=self._get_trend(n2, n1),
-            interpretacao="Mede a capacidade da empresa cobrir gastos financeiros com resultados operacionais. Valores >1 indicam boa cobertura."
+            interpretacao="Mede a capacidade da empresa cobrir gastos financeiros com resultados operacionais. Valores >2 indicam boa cobertura."
         )
     
     def _calc_gastos_financiamento(self) -> MetricValue:
