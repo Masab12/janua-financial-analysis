@@ -35,6 +35,7 @@ export const calculateFinancialMetrics = async (financialData) => {
     };
   } catch (error) {
     console.error('API Error:', error);
+    console.error('Response data:', error.response?.data);
     
     // Handle different types of errors
     if (error.response) {
@@ -42,10 +43,28 @@ export const calculateFinancialMetrics = async (financialData) => {
       const errorData = error.response.data;
       
       if (status === 422) {
-        // Pydantic validation error - return detailed message
-        const errorMessage = typeof errorData.detail === 'string' 
-          ? errorData.detail 
-          : 'Erro de validação dos dados. Verifique os campos preenchidos.';
+        // Pydantic validation error - try multiple formats
+        let errorMessage = 'Erro de validação dos dados. Verifique os campos preenchidos.';
+        
+        if (typeof errorData.detail === 'string') {
+          errorMessage = errorData.detail;
+        } else if (errorData.detail && typeof errorData.detail === 'object') {
+          // Handle structured error details
+          if (errorData.detail.message) {
+            errorMessage = errorData.detail.message;
+          } else if (errorData.detail.errors && Array.isArray(errorData.detail.errors)) {
+            // Handle array of errors
+            const errorMessages = errorData.detail.errors.map(err => err.message || err.msg || JSON.stringify(err));
+            errorMessage = `Erros de validação:\n${errorMessages.join('\n')}`;
+          } else {
+            // Fallback to JSON string
+            errorMessage = `Erro de validação: ${JSON.stringify(errorData.detail)}`;
+          }
+        } else if (errorData.message) {
+          errorMessage = errorData.message;
+        } else if (typeof errorData === 'string') {
+          errorMessage = errorData;
+        }
         
         return {
           success: false,
@@ -54,9 +73,15 @@ export const calculateFinancialMetrics = async (financialData) => {
         };
       } else if (status === 400) {
         // Business logic validation error - also return detailed message
-        const errorMessage = typeof errorData.detail === 'string' 
-          ? errorData.detail 
-          : 'Erro nos dados fornecidos. Verifique os valores inseridos.';
+        let errorMessage = 'Erro nos dados fornecidos. Verifique os valores inseridos.';
+        
+        if (typeof errorData.detail === 'string') {
+          errorMessage = errorData.detail;
+        } else if (errorData.message) {
+          errorMessage = errorData.message;
+        } else if (typeof errorData === 'string') {
+          errorMessage = errorData;
+        }
         
         return {
           success: false,

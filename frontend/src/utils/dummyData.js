@@ -298,7 +298,7 @@ export const validateDummyData = () => {
     
     const totalEquity = 
       balance.capital_realizado + balance.reservas_legais + balance.outras_reservas +
-      balance.resultados_transitados;
+      balance.resultados_transitados + balance.resultado_liquido_periodo;
     
     const totalLiabilities = 
       balance.financiamentos_obtidos_nc + balance.fornecedores +
