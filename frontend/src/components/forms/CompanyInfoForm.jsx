@@ -1,13 +1,19 @@
 import Input from '../common/Input';
 import Card from '../common/Card';
+import DummyDataButtonSmall from '../common/DummyDataButtonSmall';
 
-function CompanyInfoForm({ data, onChange }) {
+function CompanyInfoForm({ data, onChange, onFillDummyData }) {
   const handleChange = (field) => (e) => {
     onChange(field, e.target.value);
   };
 
   return (
-    <Card title="Informações da Empresa">
+    <Card 
+      title="Informações da Empresa"
+      action={onFillDummyData && (
+        <DummyDataButtonSmall onFillData={onFillDummyData} />
+      )}
+    >
       <div className="space-y-4">
         <Input
           label="Nome da Empresa *"

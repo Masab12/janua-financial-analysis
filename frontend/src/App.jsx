@@ -4,6 +4,7 @@ import BalanceSheetForm from './components/forms/BalanceSheetForm';
 import IncomeStatementForm from './components/forms/IncomeStatementForm';
 import ResultsDisplay from './components/results/ResultsDisplay';
 import Button from './components/common/Button';
+import DummyDataButton from './components/common/DummyDataButton';
 import { createEmptyEnhancedFinancialData } from './utils/dataStructures';
 
 import { calculateFinancialMetrics } from './services/api';
@@ -93,6 +94,33 @@ function App() {
     setLoading(false);
   };
 
+  const handleFillDummyData = async (dummyData) => {
+    try {
+      // Fill all the data at once
+      setFinancialData(dummyData);
+      
+      // If we're in edit mode, clear the preserved results
+      if (editMode) {
+        setPreservedResults(null);
+      }
+      
+      // Clear any existing errors
+      setError(null);
+      
+      // If we're on the results page, go back to step 1 to show the filled data
+      if (currentStep === 4) {
+        setCurrentStep(1);
+        setResults(null);
+        setEditMode(false);
+      }
+      
+      console.log('✅ Dummy data filled successfully');
+    } catch (error) {
+      console.error('❌ Error filling dummy data:', error);
+      setError('Erro ao preencher dados de exemplo. Tente novamente.');
+    }
+  };
+
   const handleReset = () => {
     setFinancialData(createEmptyEnhancedFinancialData());
     setResults(null);
@@ -160,7 +188,14 @@ function App() {
               <p className="text-sm md:text-base text-gray-200 mt-1">Análise Financeira Empresarial</p>
             </div>
             <div className="flex items-center space-x-2 md:space-x-4">
-
+              {/* Dummy Data Button - Only show when not on results page */}
+              {currentStep < 4 && (
+                <DummyDataButton 
+                  onFillData={handleFillDummyData}
+                  className="bg-white bg-opacity-10 hover:bg-opacity-20 text-white border-white border-opacity-30"
+                />
+              )}
+              
               <button
                 type="button"
                 onClick={() => alert('Questionário em breve disponível')}
@@ -241,6 +276,7 @@ function App() {
               <CompanyInfoForm
                 data={financialData.company_info}
                 onChange={handleCompanyInfoChange}
+                onFillDummyData={handleFillDummyData}
               />
               <div className="mt-6 flex flex-col sm:flex-row gap-3 sm:gap-4">
                 {editMode && (
@@ -291,6 +327,7 @@ function App() {
                 data={financialData.balanco[currentYear]}
                 onChange={handleBalanceSheetChange}
                 year={currentYear}
+                onFillDummyData={handleFillDummyData}
               />
 
               <div className="mt-6 flex flex-col sm:flex-row gap-3 sm:gap-4">
@@ -340,6 +377,7 @@ function App() {
                 data={financialData.demonstracao_resultados[currentYear]}
                 onChange={handleIncomeStatementChange}
                 year={currentYear}
+                onFillDummyData={handleFillDummyData}
               />
 
               <div className="mt-6 flex flex-col sm:flex-row gap-3 sm:gap-4">

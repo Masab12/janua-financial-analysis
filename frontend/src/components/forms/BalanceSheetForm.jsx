@@ -1,9 +1,10 @@
 import React, { useState, useMemo } from 'react';
 import Input from '../common/Input';
 import Card from '../common/Card';
+import DummyDataButtonSmall from '../common/DummyDataButtonSmall';
 import { balanceSheetFields } from '../../utils/fieldLabels';
 
-const BalanceSheetForm = ({ data, onChange, year }) => {
+const BalanceSheetForm = ({ data, onChange, year, onFillDummyData }) => {
   const [expandedSections, setExpandedSections] = useState({
     'Ativo Não Corrente': true,
     'Ativo Corrente': false,
@@ -77,7 +78,12 @@ const BalanceSheetForm = ({ data, onChange, year }) => {
   const balanceStatus = getBalanceStatus();
 
   return (
-    <Card title={`Balanço - ${year === 'year_n' ? 'Ano N (Atual)' : year === 'year_n1' ? 'Ano N-1' : 'Ano N-2'}`}>
+    <Card 
+      title={`Balanço - ${year === 'year_n' ? 'Ano N (Atual)' : year === 'year_n1' ? 'Ano N-1' : 'Ano N-2'}`}
+      action={onFillDummyData && (
+        <DummyDataButtonSmall onFillData={onFillDummyData} />
+      )}
+    >
       {/* Balance Status Indicator */}
       <div className="mb-6 p-4 bg-gray-50 rounded-lg border">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">

@@ -1,9 +1,10 @@
 import React, { useState, useMemo } from 'react';
 import Input from '../common/Input';
 import Card from '../common/Card';
+import DummyDataButtonSmall from '../common/DummyDataButtonSmall';
 import { incomeStatementFields } from '../../utils/fieldLabels';
 
-const IncomeStatementForm = ({ data, onChange, year }) => {
+const IncomeStatementForm = ({ data, onChange, year, onFillDummyData }) => {
   const [expandedSections, setExpandedSections] = useState({
     'Rendimentos e Ganhos': true,
     'Gastos e Perdas': false,
@@ -69,7 +70,12 @@ const IncomeStatementForm = ({ data, onChange, year }) => {
                    year === 'year_n1' ? 'Ano N-1' : 'Ano N (Atual)';
 
   return (
-    <Card title={`Demonstração de Resultados - ${yearLabel}`}>
+    <Card 
+      title={`Demonstração de Resultados - ${yearLabel}`}
+      action={onFillDummyData && (
+        <DummyDataButtonSmall onFillData={onFillDummyData} />
+      )}
+    >
       {/* Key Metrics Summary */}
       <div className="mb-6 bg-gray-50 rounded-lg p-4 border">
         <h3 className="font-semibold text-gray-900 text-sm mb-3">Resumo dos Resultados</h3>
