@@ -4,6 +4,8 @@
  */
 
 export const dummyFinancialData = {
+  // Production backend expects nome_entidade at root level
+  nome_entidade: "Comercial Portuguesa Lda",
   company_info: {
     nome_empresa: "Comercial Portuguesa Lda",
     setor_atividade: "Comércio a Retalho de Produtos Alimentares",
