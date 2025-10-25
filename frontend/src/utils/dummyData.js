@@ -42,7 +42,7 @@ export const dummyFinancialData = {
       premios_emissao: 0,
       reservas_legais: 15000,
       outras_reservas: 25000,
-      resultados_transitados: 45000,
+      resultados_transitados: 15179, // Adjusted to balance the equation
       ajustamentos_ativos_financeiros: 0,
       excedentes_revalorizacao: 0,
       outras_variacoes_capital_proprio: 0,
@@ -98,7 +98,7 @@ export const dummyFinancialData = {
       premios_emissao: 0,
       reservas_legais: 15000,
       outras_reservas: 25000,
-      resultados_transitados: 70000,
+      resultados_transitados: 57800, // Adjusted to balance the equation
       ajustamentos_ativos_financeiros: 0,
       excedentes_revalorizacao: 0,
       outras_variacoes_capital_proprio: 0,
@@ -154,7 +154,7 @@ export const dummyFinancialData = {
       premios_emissao: 0,
       reservas_legais: 15000,
       outras_reservas: 25000,
-      resultados_transitados: 95000,
+      resultados_transitados: 51566, // Adjusted to balance the equation
       ajustamentos_ativos_financeiros: 0,
       excedentes_revalorizacao: 0,
       outras_variacoes_capital_proprio: 0,
@@ -187,7 +187,7 @@ export const dummyFinancialData = {
       ganhos_perdas_subsidiarias: 0,
       variacao_inventarios_producao: 0,
       trabalhos_propria_entidade: 0,
-      cmvmc: 252000, // 60% of sales
+      cmvmc: 225679, // Adjusted to match balance sheet net result
       fornecimentos_servicos_externos: 58800, // 14% of sales
       gastos_pessoal: 84000, // 20% of sales
       imparidade_inventarios: 0,
@@ -208,7 +208,7 @@ export const dummyFinancialData = {
       ganhos_perdas_subsidiarias: 0,
       variacao_inventarios_producao: 0,
       trabalhos_propria_entidade: 0,
-      cmvmc: 270000, // 60% of sales
+      cmvmc: 264079, // Adjusted to match balance sheet net result
       fornecimentos_servicos_externos: 63000, // 14% of sales
       gastos_pessoal: 90000, // 20% of sales
       imparidade_inventarios: 0,
@@ -229,7 +229,7 @@ export const dummyFinancialData = {
       ganhos_perdas_subsidiarias: 0,
       variacao_inventarios_producao: 0,
       trabalhos_propria_entidade: 0,
-      cmvmc: 291000, // 60% of sales
+      cmvmc: 274316, // Adjusted to match balance sheet net result
       fornecimentos_servicos_externos: 67900, // 14% of sales
       gastos_pessoal: 97000, // 20% of sales
       imparidade_inventarios: 0,

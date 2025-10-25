@@ -42,7 +42,7 @@ export const calculateFinancialMetrics = async (financialData) => {
       const errorData = error.response.data;
       
       if (status === 422) {
-        // Validation error - return detailed message
+        // Pydantic validation error - return detailed message
         const errorMessage = typeof errorData.detail === 'string' 
           ? errorData.detail 
           : 'Erro de validação dos dados. Verifique os campos preenchidos.';
@@ -53,10 +53,15 @@ export const calculateFinancialMetrics = async (financialData) => {
           validationError: true,
         };
       } else if (status === 400) {
-        // Business logic error
+        // Business logic validation error - also return detailed message
+        const errorMessage = typeof errorData.detail === 'string' 
+          ? errorData.detail 
+          : 'Erro nos dados fornecidos. Verifique os valores inseridos.';
+        
         return {
           success: false,
-          error: errorData.detail || 'Erro nos dados fornecidos. Verifique os valores inseridos.',
+          error: errorMessage,
+          validationError: true,
         };
       } else if (status === 500) {
         // Server error
