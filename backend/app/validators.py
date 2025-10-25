@@ -20,39 +20,49 @@ def validate_balance_sheet(balanco: BalanceSheet) -> bool:
     
     We allow a tolerance for rounding differences in manually entered/test data.
     """
-    tolerance = 5000.0  # Tolerance for rounding differences (€5,000 for testing)
+    tolerance = 1000.0  # Reduced tolerance for better accuracy (€1,000)
     
     # Check year N
-    diff_n = abs(balanco.year_n.total_ativo - 
-                 (balanco.year_n.total_passivo + balanco.year_n.total_capital_proprio)) #Check Year N
+    assets_n = balanco.year_n.total_ativo
+    liabilities_equity_n = balanco.year_n.total_passivo + balanco.year_n.total_capital_proprio
+    diff_n = abs(assets_n - liabilities_equity_n)
     
     if diff_n > tolerance:
         logger.warning(f"Balance sheet year N doesn't balance. Difference: {diff_n}")
         raise BalanceSheetError(
-            f"Balanço do ano N não está equilibrado. "
-            f"Diferença: €{diff_n:.2f}. "
-            f"Ativo: €{balanco.year_n.total_ativo:.2f}, "
-            f"Passivo+CP: €{balanco.year_n.total_passivo + balanco.year_n.total_capital_proprio:.2f}"
+            f"REGRA VIOLADA: Total do Ativo = Total do Passivo + Capital Próprio (Ano N)\n"
+            f"Diferença encontrada: €{diff_n:.2f}\n"
+            f"Total do Ativo (Ano N): €{assets_n:,.2f}\n"
+            f"Total do Passivo + Capital Próprio (Ano N): €{liabilities_equity_n:,.2f}\n"
+            f"Verifique se todos os valores foram inseridos corretamente."
         )
     
     # Check year N-1
-    diff_n1 = abs(balanco.year_n1.total_ativo - 
-                  (balanco.year_n1.total_passivo + balanco.year_n1.total_capital_proprio))
+    assets_n1 = balanco.year_n1.total_ativo
+    liabilities_equity_n1 = balanco.year_n1.total_passivo + balanco.year_n1.total_capital_proprio
+    diff_n1 = abs(assets_n1 - liabilities_equity_n1)
     
     if diff_n1 > tolerance:
         logger.warning(f"Balance sheet year N-1 doesn't balance. Difference: {diff_n1}")
         raise BalanceSheetError(
-            f"Balanço do ano N-1 não está equilibrado. Diferença: €{diff_n1:.2f}"
+            f"REGRA VIOLADA: Total do Ativo = Total do Passivo + Capital Próprio (Ano N-1)\n"
+            f"Diferença encontrada: €{diff_n1:.2f}\n"
+            f"Total do Ativo (Ano N-1): €{assets_n1:,.2f}\n"
+            f"Total do Passivo + Capital Próprio (Ano N-1): €{liabilities_equity_n1:,.2f}"
         )
     
     # Check year N-2
-    diff_n2 = abs(balanco.year_n2.total_ativo - 
-                  (balanco.year_n2.total_passivo + balanco.year_n2.total_capital_proprio))
+    assets_n2 = balanco.year_n2.total_ativo
+    liabilities_equity_n2 = balanco.year_n2.total_passivo + balanco.year_n2.total_capital_proprio
+    diff_n2 = abs(assets_n2 - liabilities_equity_n2)
     
     if diff_n2 > tolerance:
         logger.warning(f"Balance sheet year N-2 doesn't balance. Difference: {diff_n2}")
         raise BalanceSheetError(
-            f"Balanço do ano N-2 não está equilibrado. Diferença: €{diff_n2:.2f}"
+            f"REGRA VIOLADA: Total do Ativo = Total do Passivo + Capital Próprio (Ano N-2)\n"
+            f"Diferença encontrada: €{diff_n2:.2f}\n"
+            f"Total do Ativo (Ano N-2): €{assets_n2:,.2f}\n"
+            f"Total do Passivo + Capital Próprio (Ano N-2): €{liabilities_equity_n2:,.2f}"
         )
     
     logger.debug("Balance sheet validation passed for all years")
@@ -143,8 +153,11 @@ def validate_net_result_consistency(balanco: BalanceSheet, demonstracao: IncomeS
     
     if abs(bs_result_n - is_result_n) > 1.0:  # Allow €1 tolerance for rounding
         raise ValidationError(
-            f"Resultado líquido do período no balanço (€{bs_result_n:.2f}) "
-            f"diferente da Demonstração de Resultados (€{is_result_n:.2f}) para o ano N"
+            f"REGRA VIOLADA: Resultado Líquido deve ser igual no Balanço e na Demonstração de Resultados (Ano N)\n"
+            f"Resultado Líquido no Balanço (Ano N): €{bs_result_n:,.2f}\n"
+            f"Resultado Líquido na Demonstração de Resultados (Ano N): €{is_result_n:,.2f}\n"
+            f"Diferença: €{abs(bs_result_n - is_result_n):.2f}\n"
+            f"Verifique se inseriu o mesmo valor nos dois locais."
         )
     
     # Check year N-1
@@ -153,8 +166,10 @@ def validate_net_result_consistency(balanco: BalanceSheet, demonstracao: IncomeS
     
     if abs(bs_result_n1 - is_result_n1) > 1.0:
         raise ValidationError(
-            f"Resultado líquido do período no balanço (€{bs_result_n1:.2f}) "
-            f"diferente da Demonstração de Resultados (€{is_result_n1:.2f}) para o ano N-1"
+            f"REGRA VIOLADA: Resultado Líquido deve ser igual no Balanço e na Demonstração de Resultados (Ano N-1)\n"
+            f"Resultado Líquido no Balanço (Ano N-1): €{bs_result_n1:,.2f}\n"
+            f"Resultado Líquido na Demonstração de Resultados (Ano N-1): €{is_result_n1:,.2f}\n"
+            f"Diferença: €{abs(bs_result_n1 - is_result_n1):.2f}"
         )
     
     # Check year N-2
@@ -163,8 +178,10 @@ def validate_net_result_consistency(balanco: BalanceSheet, demonstracao: IncomeS
     
     if abs(bs_result_n2 - is_result_n2) > 1.0:
         raise ValidationError(
-            f"Resultado líquido do período no balanço (€{bs_result_n2:.2f}) "
-            f"diferente da Demonstração de Resultados (€{is_result_n2:.2f}) para o ano N-2"
+            f"REGRA VIOLADA: Resultado Líquido deve ser igual no Balanço e na Demonstração de Resultados (Ano N-2)\n"
+            f"Resultado Líquido no Balanço (Ano N-2): €{bs_result_n2:,.2f}\n"
+            f"Resultado Líquido na Demonstração de Resultados (Ano N-2): €{is_result_n2:,.2f}\n"
+            f"Diferença: €{abs(bs_result_n2 - is_result_n2):.2f}"
         )
     
     logger.debug("Net result consistency validation passed for all years")

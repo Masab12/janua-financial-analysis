@@ -1,19 +1,22 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import StreamingResponse
+from pydantic import ValidationError as PydanticValidationError
 from app.models.financial_data import InputData, EnhancedInputData, CalculationResult
 from app.services.calculator import FinancialCalculator
 from app.services.pdf_generator import FinancialPDFGenerator
 from app.validators import validate_all, validate_on_request_only
-from app.exceptions import CalculationError
+from app.exceptions import CalculationError, ValidationError, BalanceSheetError
+from app.utils.validation_helpers import format_pydantic_errors, create_detailed_error_response
 from app.logger import get_logger
 from datetime import datetime
+import json
 
 router = APIRouter()
 logger = get_logger(__name__)
 
 
 @router.post("/calculate", response_model=CalculationResult)
-async def calculate_metrics(data: EnhancedInputData):
+async def calculate_metrics(request: Request):
     """
     Main endpoint for financial analysis calculations.
     
@@ -29,10 +32,30 @@ async def calculate_metrics(data: EnhancedInputData):
     
     The calculations match the client's Excel file exactly.
     """
-    company_name = data.company_info.nome_empresa
-    logger.info(f"Calculation request received for: {company_name}")
-    
     try:
+        # Parse request body manually to provide better error handling
+        try:
+            body = await request.body()
+            raw_data = json.loads(body)
+            logger.debug("Raw request data parsed successfully")
+        except json.JSONDecodeError as e:
+            logger.error(f"Invalid JSON in request: {str(e)}")
+            raise HTTPException(
+                status_code=422, 
+                detail="ERRO: Dados enviados não estão em formato JSON válido. Verifique se todos os campos foram preenchidos corretamente."
+            )
+        
+        # Validate and parse with Pydantic
+        try:
+            data = EnhancedInputData(**raw_data)
+        except PydanticValidationError as e:
+            logger.error(f"Pydantic validation error: {str(e)}")
+            detailed_error = format_pydantic_errors(e)
+            raise HTTPException(status_code=422, detail=detailed_error)
+        
+        company_name = data.company_info.nome_empresa
+        logger.info(f"Calculation request received for: {company_name}")
+        
         # Validate input data first (only when explicitly requested)
         validate_on_request_only(data.balanco, data.demonstracao_resultados)
         logger.debug("Input validation passed")
@@ -59,14 +82,28 @@ async def calculate_metrics(data: EnhancedInputData):
         logger.info(f"Calculation successful for: {company_name}")
         return result
         
+    except HTTPException:
+        # Re-raise HTTP exceptions as-is
+        raise
+        
+    except ValidationError as e:
+        logger.error(f"Business validation error: {e.detail}")
+        raise HTTPException(status_code=400, detail=e.detail)
+        
+    except BalanceSheetError as e:
+        logger.error(f"Balance sheet validation error: {e.detail}")
+        raise HTTPException(status_code=400, detail=e.detail)
+        
     except (ValueError, ZeroDivisionError) as e:
         logger.error(f"Calculation error: {str(e)}")
-        raise CalculationError(
-            f"Não foi possível calcular as métricas. Verifique os dados inseridos. Erro: {str(e)}"
+        raise HTTPException(
+            status_code=400, 
+            detail=f"Não foi possível calcular as métricas. Verifique os dados inseridos. Erro: {str(e)}"
         )
     except Exception as e:
         logger.error(f"Unexpected error during calculation: {str(e)}", exc_info=True)
-        raise CalculationError(f"Erro inesperado: {str(e)}")
+        detailed_error = create_detailed_error_response(e)
+        raise HTTPException(status_code=500, detail=detailed_error)
 
 @router.post("/generate-pdf")
 async def generate_pdf(data: EnhancedInputData):

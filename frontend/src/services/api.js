@@ -34,9 +34,49 @@ export const calculateFinancialMetrics = async (financialData) => {
       data: response.data,
     };
   } catch (error) {
+    console.error('API Error:', error);
+    
+    // Handle different types of errors
+    if (error.response) {
+      const status = error.response.status;
+      const errorData = error.response.data;
+      
+      if (status === 422) {
+        // Validation error - return detailed message
+        const errorMessage = typeof errorData.detail === 'string' 
+          ? errorData.detail 
+          : 'Erro de validação dos dados. Verifique os campos preenchidos.';
+        
+        return {
+          success: false,
+          error: errorMessage,
+          validationError: true,
+        };
+      } else if (status === 400) {
+        // Business logic error
+        return {
+          success: false,
+          error: errorData.detail || 'Erro nos dados fornecidos. Verifique os valores inseridos.',
+        };
+      } else if (status === 500) {
+        // Server error
+        return {
+          success: false,
+          error: 'Erro interno do servidor. Tente novamente em alguns minutos.',
+        };
+      }
+    } else if (error.request) {
+      // Network error
+      return {
+        success: false,
+        error: 'Erro de conexão. Verifique sua conexão com a internet e tente novamente.',
+      };
+    }
+    
+    // Fallback error
     return {
       success: false,
-      error: error.response?.data?.error || error.message || 'Failed to calculate metrics',
+      error: error.message || 'Erro inesperado. Tente novamente.',
     };
   }
 };

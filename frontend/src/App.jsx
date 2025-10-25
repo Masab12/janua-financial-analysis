@@ -79,7 +79,15 @@ function App() {
       console.log('✅ Current step set to 4');
     } else {
       console.error('❌ Calculation failed:', result.error);
-      setError(result.error);
+      // Format error message for better display
+      const formattedError = result.error.includes('\n') 
+        ? result.error.split('\n').map((line, index) => (
+            <div key={index} className={index === 0 ? 'font-semibold' : 'ml-4'}>
+              {line}
+            </div>
+          ))
+        : result.error;
+      setError(formattedError);
     }
 
     setLoading(false);
@@ -207,7 +215,13 @@ function App() {
 
         {error && (
           <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4">
-            <p className="text-red-800">{error}</p>
+            <div className="text-red-800">
+              {typeof error === 'string' ? (
+                <p className="whitespace-pre-line">{error}</p>
+              ) : (
+                <div className="space-y-1">{error}</div>
+              )}
+            </div>
           </div>
         )}
 

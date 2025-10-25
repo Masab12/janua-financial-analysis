@@ -1,4 +1,52 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, validator
+from typing import Union
+import re
+
+def parse_portuguese_number(value: Union[str, int, float]) -> float:
+    """
+    Parse Portuguese number format (handles commas as decimal separators)
+    """
+    if value is None or value == "":
+        return 0.0
+    if isinstance(value, (int, float)):
+        return float(value)
+    if isinstance(value, str):
+        # Remove spaces and handle empty strings
+        value = value.strip()
+        if value == "" or value == "-":
+            return 0.0
+        
+        # Handle Portuguese format: 1.234.567,89 or simple comma format: 1234,89
+        # If there are multiple dots and one comma, assume Portuguese format
+        if value.count('.') > 1 and value.count(',') == 1:
+            # Portuguese format: 1.234.567,89
+            value = value.replace('.', '').replace(',', '.')
+        elif value.count(',') > 1 and value.count('.') == 1:
+            # US format with commas: 1,234,567.89
+            value = value.replace(',', '')
+        elif ',' in value and '.' in value:
+            # Determine which is decimal separator by position
+            comma_pos = value.rfind(',')
+            dot_pos = value.rfind('.')
+            if comma_pos > dot_pos:
+                # Comma is decimal separator: 1.234,89
+                value = value.replace('.', '').replace(',', '.')
+            else:
+                # Dot is decimal separator: 1,234.89
+                value = value.replace(',', '')
+        elif ',' in value and '.' not in value:
+            # Only comma, assume decimal separator: 1234,89
+            value = value.replace(',', '.')
+        
+        # Remove any remaining non-numeric characters except dots and minus
+        value = re.sub(r'[^\d.-]', '', value)
+        
+        try:
+            return float(value)
+        except ValueError:
+            return 0.0
+    
+    return 0.0
 
 class IncomeStatementYear(BaseModel):
     """
@@ -25,6 +73,12 @@ class IncomeStatementYear(BaseModel):
     juros_rendimentos_obtidos: float = Field(default=0.0)
     juros_gastos_suportados: float = Field(default=0.0)
     imposto_rendimento: float = Field(default=0.0)
+    
+    # Validators for Portuguese number format
+    @validator('*', pre=True)
+    def parse_numbers(cls, v):
+        """Parse Portuguese number formats for all numeric fields"""
+        return parse_portuguese_number(v)
     
     @property
     def ebitda(self) -> float:
