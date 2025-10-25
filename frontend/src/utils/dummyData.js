@@ -46,6 +46,7 @@ export const dummyFinancialData = {
       ajustamentos_ativos_financeiros: 0,
       excedentes_revalorizacao: 0,
       outras_variacoes_capital_proprio: 0,
+      resultado_liquido_periodo: 29821, // Net result for year N-2
       interesses_minoritarios: 0,
       
       // Passivo Não Corrente
@@ -101,6 +102,7 @@ export const dummyFinancialData = {
       ajustamentos_ativos_financeiros: 0,
       excedentes_revalorizacao: 0,
       outras_variacoes_capital_proprio: 0,
+      resultado_liquido_periodo: -921, // Net result for year N-1 (negative)
       interesses_minoritarios: 0,
       
       // Passivo Não Corrente
@@ -156,6 +158,7 @@ export const dummyFinancialData = {
       ajustamentos_ativos_financeiros: 0,
       excedentes_revalorizacao: 0,
       outras_variacoes_capital_proprio: 0,
+      resultado_liquido_periodo: 24634, // Net result for year N
       interesses_minoritarios: 0,
       
       // Passivo Não Corrente
